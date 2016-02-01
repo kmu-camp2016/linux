@@ -1,5 +1,6 @@
 #build 
-make
+*`make i386_kmu_defconfig`
+* make
 
 #build minimal rootfs
 make rootfs
