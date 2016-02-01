@@ -1590,6 +1590,35 @@ endif	# skip-makefile
 PHONY += FORCE
 FORCE:
 
+# KMU kernel camp
+include conf/envsetup.mk
+TOP = .
+
+ifndef QEMU
+	@echo "please set conf/envsetup.mk"
+endif
+
+IMAGE = arch/x86/boot/bzImage
+INITRD = rootfs/bin/initrd.cpio
+QEMUOPTS = -smp 2 -kernel $(IMAGE)  -initrd $(INITRD)  \
+	-nographic -append "console=ttyS0" \
+	 $(QEMUEXTRA)
+
+PHONY += qemu
+qemu: $(IMAGES)
+	$(QEMU) $(QEMUOPTS)
+
+PHONY += qemu-gdb
+qemu-gdb: $(IMAGES) .gdbinit
+	@echo "*** Now run 'gdb'." 1>&2
+	$(QEMU) $(QEMUOPTS) -s -S 
+
+PHONY += rootfs
+rootfs:
+	$(shell cd rootfs; ./gen_initrd.sh)
+	$(shell cd $(TOP))
+
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
+ 
